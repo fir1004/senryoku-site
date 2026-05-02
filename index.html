@@ -3,74 +3,201 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>最終戦力計算</title>
+<title>育成チェッカー</title>
 
 <style>
 body {
   margin: 0;
-  font-family: sans-serif;
-  background: linear-gradient(180deg, #fff0fb, #f4e8ff);
+  font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: linear-gradient(180deg, #1a0b2e, #2a1248);
+  color: #f5d9ff;
   text-align: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#sparkle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
 }
 
 #lock {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.lock-box {
-  background: white;
-  padding: 30px;
-  border-radius: 20px;
+.lock-box, .box {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 28px;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,157,230,0.5);
+  border-radius: 28px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(180,100,255,0.35);
+}
+
+h1, h2 {
+  color: #ff9de6;
+  text-shadow: 0 0 12px rgba(255,150,255,0.7);
 }
 
 #display {
-  font-size: 28px;
-  margin: 10px;
+  font-size: 32px;
+  letter-spacing: 8px;
+  margin: 18px 0;
+  color: #ffffff;
+  text-shadow: 0 0 10px #ff9de6;
 }
 
 .keypad {
   display: grid;
-  grid-template-columns: repeat(3, 70px);
-  gap: 10px;
+  grid-template-columns: repeat(3, 74px);
+  gap: 12px;
+  justify-content: center;
+}
+
+button {
+  margin-top: 20px;
+  padding: 16px 30px;
+  font-size: 21px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff9de6, #9b5cff);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 8px 20px rgba(180,120,255,0.55);
+  transition: all 0.2s;
+  cursor: pointer;
 }
 
 .keypad button {
-  padding: 15px;
-  font-size: 18px;
+  margin-top: 0;
+  padding: 16px;
+  font-size: 20px;
+  border-radius: 18px;
 }
 
-.box {
-  max-width: 400px;
-  margin: 30px auto;
-  padding: 20px;
-  background: white;
-  border-radius: 20px;
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(180,120,255,0.75);
+}
+
+button:active {
+  transform: scale(0.93);
+  box-shadow: 0 0 20px #ff9de6, 0 0 40px #c77dff;
+}
+
+button:disabled {
+  background: #999;
+}
+
+#question {
+  font-size: 23px;
+  margin-bottom: 14px;
 }
 
 input {
   width: 90%;
-  padding: 12px;
-  font-size: 20px;
+  padding: 16px;
+  font-size: 24px;
+  border-radius: 18px;
+  border: 3px solid #c77dff;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  text-align: center;
+  outline: none;
+}
+
+input:focus {
+  border-color: #ff9de6;
+  box-shadow: 0 0 16px rgba(255,150,255,0.8);
+}
+
+.hint {
+  font-size: 14px;
+  color: #e8c7ff;
+}
+
+.error {
+  color: #ff9de6;
+  font-weight: bold;
+}
+
+.result-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 25px;
+}
+
+.character img {
+  width: 120px;
+  filter: drop-shadow(0 8px 8px rgba(0,0,0,0.35));
 }
 
 .bubble {
-  border: 3px solid #d77cff;
-  border-radius: 20px;
-  padding: 15px;
+  border-radius: 24px;
+  padding: 20px;
+  font-size: 22px;
+  line-height: 1.6;
+  max-width: 250px;
+  background: linear-gradient(135deg, #2a1248, #3a1c6b);
+  border: 3px solid #c77dff;
+  box-shadow: 0 0 18px rgba(200,120,255,0.45);
 }
 
-.rank-s { background: #fff7d6; }
-.rank-a { background: #fff0f6; }
-.rank-b { background: #f7efff; }
-.rank-c { background: #eef8ff; }
-.rank-d { background: #f1f1f1; }
+.rank-s {
+  border-color: gold;
+  box-shadow: 0 0 25px gold;
+}
+
+.rank-a {
+  border-color: #ff9de6;
+}
+
+.rank-b {
+  border-color: #b879ff;
+}
+
+.rank-c {
+  border-color: #8fc7ff;
+}
+
+.rank-d {
+  border-color: #777;
+}
+
+.fade-out {
+  animation: fadeOut 0.5s forwards;
+}
+
+.fade-in {
+  animation: fadeIn 0.6s forwards;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 </style>
 </head>
 
 <body>
+
+<canvas id="sparkle"></canvas>
 
 <div id="lock">
   <div class="lock-box">
@@ -98,119 +225,247 @@ input {
 
 <div id="main" style="display:none;">
   <div class="box">
-    <h1>最終戦力計算</h1>
+    <h1>🌙 育成チェッカー ✨</h1>
 
     <h2 id="question">HPを入力してね</h2>
     <input type="number" id="input">
-    <p id="hint"></p>
-    <p id="inputError" style="color:red;"></p>
 
-    <button onclick="next()">次へ</button>
+    <p class="hint" id="hint">HPの数字だけ入れてね</p>
+    <p class="error" id="inputError"></p>
+
+    <button onclick="next()">▶︎ 次へ</button>
   </div>
 </div>
 
 <script>
 let inputPass = "";
+let miss = 0;
 
-function press(num){
-  if(inputPass.length>=4) return;
-  inputPass+=num;
-  document.getElementById("display").textContent=inputPass.padEnd(4,"・");
+function press(num) {
+  if (inputPass.length >= 4) return;
+  inputPass += num;
+  document.getElementById("display").textContent = inputPass.padEnd(4, "・");
 }
 
-function clearPass(){
-  inputPass="";
-  document.getElementById("display").textContent="・・・・";
+function clearPass() {
+  inputPass = "";
+  document.getElementById("display").textContent = "・・・・";
 }
 
-function unlock(){
-  if(inputPass==="5423"){
-    document.getElementById("lock").style.display="none";
-    document.getElementById("main").style.display="block";
-  }else{
-    document.getElementById("error").textContent="ちがうよ";
+function unlock() {
+  if (inputPass === "5423") {
+    document.getElementById("lock").classList.add("fade-out");
+
+    setTimeout(() => {
+      document.getElementById("lock").style.display = "none";
+      document.getElementById("main").style.display = "block";
+      document.getElementById("main").classList.add("fade-in");
+    }, 500);
+
+  } else {
+    miss++;
+    document.getElementById("error").textContent = "ちがうよ…！";
     clearPass();
+
+    if (miss >= 3) {
+      document.getElementById("error").textContent = "まちがえすぎ！ちょっと待ってね";
+      document.querySelectorAll(".keypad button").forEach(btn => btn.disabled = true);
+
+      setTimeout(() => {
+        document.querySelectorAll(".keypad button").forEach(btn => btn.disabled = false);
+        document.getElementById("error").textContent = "";
+        miss = 0;
+      }, 3000);
+    }
   }
 }
 
-let step=0;
-let data={};
+let step = 0;
+let data = {};
 
-const questions=[
-  {key:"hp",text:"HPを入力してね",hint:"HPの数字だけ入れてね"},
-  {key:"main",text:"合ってる型の攻撃力を入力してね！",hint:"知能型なら知能、パワー型ならパワー"},
-  {key:"sub",text:"合ってない型の攻撃力を入力してね",hint:"パワー型なら知能の攻撃力だよ"},
-  {key:"up",text:"大UP回数を入力してね",hint:"全部まとめた回数"},
-  {key:"speed",text:"速度を入力してね",hint:"速度10なら0、12なら1"}
+const questions = [
+  {
+    key: "hp",
+    text: "HPを入力してね",
+    hint: "HPの数字だけ入れてね"
+  },
+  {
+    key: "main",
+    text: "合ってる型の攻撃力を入力してね！",
+    hint: "知能型なら知能、パワー型ならパワー"
+  },
+  {
+    key: "sub",
+    text: "合ってない型の攻撃力を入力してね",
+    hint: "パワー型なら知能の攻撃力だよ"
+  },
+  {
+    key: "up",
+    text: "大UP回数を入力してね",
+    hint: "回避・会心・命中の大UPを全部まとめた回数"
+  },
+  {
+    key: "speed",
+    text: "速度を入力してね",
+    hint: "速度10なら0、速度12なら1"
+  }
 ];
 
-function next(){
-  let value=document.getElementById("input").value;
-  if(value===""){
-    document.getElementById("inputError").textContent="数字入れて";
+function next() {
+  const input = document.getElementById("input");
+  const value = input.value;
+  const error = document.getElementById("inputError");
+
+  error.textContent = "";
+
+  if (value === "") {
+    error.textContent = "数字を入れてね";
     return;
   }
 
-  data[questions[step].key]=Number(value);
+  if (Number(value) < 0) {
+    error.textContent = "0以上の数字を入れてね";
+    return;
+  }
+
+  if (questions[step].key === "speed" && Number(value) !== 0 && Number(value) !== 1) {
+    error.textContent = "速度10なら0、速度12なら1を入れてね";
+    return;
+  }
+
+  data[questions[step].key] = Number(value);
   step++;
 
-  document.getElementById("input").value="";
-  document.getElementById("inputError").textContent="";
+  input.value = "";
 
-  if(step<questions.length){
-    document.getElementById("question").textContent=questions[step].text;
-    document.getElementById("hint").textContent=questions[step].hint;
-  }else{
+  if (step < questions.length) {
+    document.getElementById("question").textContent = questions[step].text;
+    document.getElementById("hint").textContent = questions[step].hint;
+    input.focus();
+  } else {
     calc();
   }
 }
 
-function calc(){
-  const total=
-    data.hp*2+
-    data.main*40+
-    data.sub*6+
-    data.up*500+
-    data.speed*400+
-    6000+
-    24920+
+function calc() {
+  const total =
+    data.hp * 2 +
+    data.main * 40 +
+    data.sub * 6 +
+    data.up * 500 +
+    data.speed * 400 +
+    6000 +
+    24920 +
     75000;
 
-  let comment="";
-  let rankClass="";
+  let comment = "";
+  let rank = "";
+  let rankClass = "";
+  let bg = "";
 
-  if(total>=210000){
-    comment="21万…！？脅威！！！";
-    rankClass="rank-s";
-  }else if(total>=205000){
-    comment="はーい惜しかったねえ〜！";
-    rankClass="rank-a";
-  }else if(total>=200000){
-    comment="まぁ、出るよね！";
-    rankClass="rank-a";
-  }else if(total>=190000){
-    comment="まぁその程度だよね";
-    rankClass="rank-b";
-  }else if(total>=180000){
-    comment="え？そいつ育てるの？";
-    rankClass="rank-c";
-  }else{
-    comment="・・・";
-    rankClass="rank-d";
+  if (total >= 210000) {
+    rank = "Sランク";
+    comment = "21万…！？脅威！！！";
+    rankClass = "rank-s";
+    bg = "linear-gradient(180deg, #3a2600, #ffcc00)";
+  } else if (total >= 205000) {
+    rank = "A+ランク";
+    comment = "はーい惜しかったねえ〜！";
+    rankClass = "rank-a";
+    bg = "linear-gradient(180deg, #3a0d2f, #ff9de6)";
+  } else if (total >= 200000) {
+    rank = "Aランク";
+    comment = "まぁ、出るよね！";
+    rankClass = "rank-a";
+    bg = "linear-gradient(180deg, #3a0d2f, #ff9de6)";
+  } else if (total >= 190000) {
+    rank = "Bランク";
+    comment = "まぁその程度だよね";
+    rankClass = "rank-b";
+    bg = "linear-gradient(180deg, #241040, #7b3cff)";
+  } else if (total >= 180000) {
+    rank = "Cランク";
+    comment = "え？そいつ育てるの？";
+    rankClass = "rank-c";
+    bg = "linear-gradient(180deg, #102840, #5ca8ff)";
+  } else {
+    rank = "Dランク";
+    comment = "よわい！";
+    rankClass = "rank-d";
+    bg = "linear-gradient(180deg, #222, #111)";
   }
 
-  document.body.innerHTML=`
-    <div class="box">
-      <h1>結果</h1>
-      <div class="bubble ${rankClass}">
-        最終戦力は…<br>
-        <strong>${total.toLocaleString()}！</strong><br><br>
-        ${comment}
+  document.body.style.background = bg;
+
+  document.body.innerHTML = `
+    <canvas id="sparkle"></canvas>
+
+    <div class="box fade-in">
+      <h1>計算結果</h1>
+
+      <div class="result-area">
+        <div class="character">
+          <img src="character.png">
+        </div>
+
+        <div class="bubble ${rankClass}">
+          最終戦力は…<br>
+          <strong>${total.toLocaleString()}！</strong><br><br>
+          【${rank}】<br>
+          ${comment}
+        </div>
       </div>
-      <button onclick="location.reload()">もう一回</button>
+
+      <button onclick="location.reload()">▶︎ もう一度</button>
     </div>
   `;
+
+  startSparkle();
 }
+
+function startSparkle() {
+  const canvas = document.getElementById("sparkle");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let particles = [];
+
+  for (let i = 0; i < 70; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 2 + 1,
+      d: Math.random() * 1 + 0.3
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgba(255,200,255,0.75)";
+
+    for (let i = 0; i < particles.length; i++) {
+      let p = particles[i];
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      p.y += p.d;
+
+      if (p.y > canvas.height) {
+        p.y = 0;
+        p.x = Math.random() * canvas.width;
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+startSparkle();
 </script>
 
 </body>
