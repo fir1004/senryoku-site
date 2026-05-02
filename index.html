@@ -6,214 +6,67 @@
 <title>最終戦力計算</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
-    background: linear-gradient(180deg, #fff0fb, #f4e8ff);
-    text-align: center;
-    color: #4a2b4f;
-  }
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: linear-gradient(180deg, #fff0fb, #f4e8ff);
+  text-align: center;
+}
 
-  #lock {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(180deg, #ffe6fa, #e9d8ff);
-  }
+#lock {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .lock-box {
-    background: white;
-    padding: 30px;
-    border-radius: 24px;
-    text-align: center;
-    box-shadow: 0 10px 25px rgba(150, 90, 180, 0.25);
-  }
+.lock-box {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+}
 
-  .lock-box h2 {
-    color: #b85cff;
-  }
+#display {
+  font-size: 28px;
+  margin: 10px;
+}
 
-  #display {
-    font-size: 28px;
-    letter-spacing: 8px;
-    margin: 15px 0;
-    color: #b85cff;
-  }
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 70px);
+  gap: 10px;
+}
 
-  .keypad {
-    display: grid;
-    grid-template-columns: repeat(3, 70px);
-    gap: 10px;
-    justify-content: center;
-  }
+.keypad button {
+  padding: 15px;
+  font-size: 18px;
+}
 
-  .keypad button {
-    padding: 15px;
-    font-size: 18px;
-    border-radius: 12px;
-    border: none;
-    background: #d77cff;
-    color: white;
-    font-weight: bold;
-  }
+.box {
+  max-width: 400px;
+  margin: 30px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 20px;
+}
 
-  .keypad button:active {
-    transform: scale(0.9);
-  }
+input {
+  width: 90%;
+  padding: 12px;
+  font-size: 20px;
+}
 
-  .keypad button:disabled {
-    background: #cfcfcf;
-  }
+.bubble {
+  border: 3px solid #d77cff;
+  border-radius: 20px;
+  padding: 15px;
+}
 
-  #error {
-    margin-top: 10px;
-    color: #ff5a9e;
-    font-weight: bold;
-  }
-
-  .box {
-    max-width: 420px;
-    margin: 40px auto;
-    padding: 24px;
-    background: white;
-    border-radius: 24px;
-    box-shadow: 0 8px 20px rgba(160, 90, 180, 0.2);
-  }
-
-  h1 {
-    color: #b35bd6;
-  }
-
-  #question {
-    font-size: 22px;
-    margin-bottom: 16px;
-  }
-
-  input {
-    width: 90%;
-    padding: 14px;
-    font-size: 22px;
-    border: 3px solid #e7b7ff;
-    border-radius: 16px;
-    text-align: center;
-    outline: none;
-  }
-
-  input:focus {
-    border-color: #c45cff;
-    background: #fff8ff;
-  }
-
-  .hint {
-    font-size: 14px;
-    color: #8a6a8f;
-    margin-top: 10px;
-  }
-
-  .error {
-    color: #e0528d;
-    font-weight: bold;
-    margin-top: 12px;
-  }
-
-  button {
-    margin-top: 18px;
-    padding: 12px 24px;
-    font-size: 18px;
-    border: none;
-    border-radius: 999px;
-    background: #d77cff;
-    color: white;
-    font-weight: bold;
-  }
-
-  .result-area {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 14px;
-    margin-top: 30px;
-  }
-
-  .character img {
-    width: 120px;
-    filter: drop-shadow(0 6px 6px rgba(0,0,0,0.18));
-  }
-
-  .bubble {
-    position: relative;
-    background: white;
-    border: 3px solid #d77cff;
-    border-radius: 22px;
-    padding: 18px;
-    font-size: 21px;
-    line-height: 1.6;
-    max-width: 240px;
-  }
-
-  .bubble::before {
-    content: "";
-    position: absolute;
-    left: -18px;
-    top: 36px;
-    border-width: 10px 18px 10px 0;
-    border-style: solid;
-    border-color: transparent #d77cff transparent transparent;
-  }
-
-  .bubble::after {
-    content: "";
-    position: absolute;
-    left: -13px;
-    top: 39px;
-    border-width: 7px 14px 7px 0;
-    border-style: solid;
-    border-color: transparent white transparent transparent;
-  }
-
-  .rank-s {
-    border-color: #ffcc33;
-    background: #fff7d6;
-  }
-
-  .rank-a {
-    border-color: #ff8fb3;
-    background: #fff0f6;
-  }
-
-  .rank-b {
-    border-color: #b879ff;
-    background: #f7efff;
-  }
-
-  .rank-c {
-    border-color: #8fc7ff;
-    background: #eef8ff;
-  }
-
-  .rank-d {
-    border-color: #999999;
-    background: #f1f1f1;
-  }
-
-  .fade-out {
-    animation: fadeOut 0.5s forwards;
-  }
-
-  .fade-in {
-    animation: fadeIn 0.6s forwards;
-  }
-
-  @keyframes fadeOut {
-    from { opacity: 1; transform: scale(1); }
-    to { opacity: 0; transform: scale(1.1); }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+.rank-s { background: #fff7d6; }
+.rank-a { background: #fff0f6; }
+.rank-b { background: #f7efff; }
+.rank-c { background: #eef8ff; }
+.rank-d { background: #f1f1f1; }
 </style>
 </head>
 
@@ -221,23 +74,19 @@
 
 <div id="lock">
   <div class="lock-box">
-    <h2>ふぃのひみつ戦力チェッカー🔐</h2>
-
+    <h2>育成チェッカー🔐</h2>
     <div id="display">・・・・</div>
 
     <div class="keypad">
       <button onclick="press(1)">1</button>
       <button onclick="press(2)">2</button>
       <button onclick="press(3)">3</button>
-
       <button onclick="press(4)">4</button>
       <button onclick="press(5)">5</button>
       <button onclick="press(6)">6</button>
-
       <button onclick="press(7)">7</button>
       <button onclick="press(8)">8</button>
       <button onclick="press(9)">9</button>
-
       <button onclick="clearPass()">C</button>
       <button onclick="press(0)">0</button>
       <button onclick="unlock()">OK</button>
@@ -252,9 +101,9 @@
     <h1>最終戦力計算</h1>
 
     <h2 id="question">HPを入力してね</h2>
-    <input type="number" id="input" autofocus>
-    <div class="hint" id="hint">数字を入れたら、少し待つと次へ進むよ</div>
-    <div class="error" id="inputError"></div>
+    <input type="number" id="input">
+    <p id="hint"></p>
+    <p id="inputError" style="color:red;"></p>
 
     <button onclick="next()">次へ</button>
   </div>
@@ -262,213 +111,103 @@
 
 <script>
 let inputPass = "";
-let miss = 0;
 
-function press(num) {
-  if (inputPass.length >= 4) return;
-  inputPass += num;
-  updateDisplay();
+function press(num){
+  if(inputPass.length>=4) return;
+  inputPass+=num;
+  document.getElementById("display").textContent=inputPass.padEnd(4,"・");
 }
 
-function clearPass() {
-  inputPass = "";
-  updateDisplay();
+function clearPass(){
+  inputPass="";
+  document.getElementById("display").textContent="・・・・";
 }
 
-function updateDisplay() {
-  document.getElementById("display").textContent = inputPass.padEnd(4, "・");
-}
-
-function unlock() {
-  if (inputPass === "5423") {
-    document.getElementById("lock").classList.add("fade-out");
-
-    setTimeout(() => {
-      document.getElementById("lock").style.display = "none";
-      document.getElementById("main").style.display = "block";
-      document.getElementById("main").classList.add("fade-in");
-    }, 500);
-
-  } else {
-    miss++;
-    document.getElementById("error").textContent = "ちがうよ…！";
-    inputPass = "";
-    updateDisplay();
-
-    if (miss >= 3) {
-      document.getElementById("error").textContent = "まちがえすぎ！ちょっと待ってね";
-      document.querySelectorAll(".keypad button").forEach(btn => btn.disabled = true);
-
-      setTimeout(() => {
-        document.querySelectorAll(".keypad button").forEach(btn => btn.disabled = false);
-        document.getElementById("error").textContent = "";
-        miss = 0;
-      }, 3000);
-    }
+function unlock(){
+  if(inputPass==="5423"){
+    document.getElementById("lock").style.display="none";
+    document.getElementById("main").style.display="block";
+  }else{
+    document.getElementById("error").textContent="ちがうよ";
+    clearPass();
   }
 }
 
-let step = 0;
-let data = {};
-let timer = null;
+let step=0;
+let data={};
 
-const questions = [
-  {
-    key: "hp",
-    text: "HPを入力してね",
-    hint: "HPの数字だけ入れてね",
-    min: 0
-  },
-  {
-    key: "main",
-    text: "合ってる型の数値を入力してね",
-    hint: "知能型なら知能、パワー型ならパワー",
-    min: 0
-  },
-  {
-    key: "sub",
-    text: "合ってない型の数値を入力してね",
-    hint: "合ってない方の数値だよ",
-    min: 0
-  },
-  {
-    key: "up",
-    text: "大UP回数を入力してね",
-    hint: "回避・会心・命中の大UPを全部まとめた回数",
-    min: 0
-  },
-  {
-    key: "speed",
-    text: "速度ボーナスを入力してね",
-    hint: "速度10なら0、速度12なら1",
-    min: 0,
-    max: 1
-  }
+const questions=[
+  {key:"hp",text:"HPを入力してね",hint:"HPの数字だけ入れてね"},
+  {key:"main",text:"合ってる型の攻撃力を入力してね！",hint:"知能型なら知能、パワー型ならパワー"},
+  {key:"sub",text:"合ってない型の攻撃力を入力してね",hint:"パワー型なら知能の攻撃力だよ"},
+  {key:"up",text:"大UP回数を入力してね",hint:"全部まとめた回数"},
+  {key:"speed",text:"速度を入力してね",hint:"速度10なら0、12なら1"}
 ];
 
-const input = document.getElementById("input");
-
-input.addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    next();
-  }
-});
-
-input.addEventListener("input", function() {
-  clearTimeout(timer);
-
-  timer = setTimeout(function() {
-    if (input.value !== "") {
-      next();
-    }
-  }, 900);
-});
-
-function next() {
-  clearTimeout(timer);
-
-  const value = Number(input.value);
-  const q = questions[step];
-  const error = document.getElementById("inputError");
-
-  error.textContent = "";
-
-  if (input.value === "") {
-    error.textContent = "数字を入れてね";
+function next(){
+  let value=document.getElementById("input").value;
+  if(value===""){
+    document.getElementById("inputError").textContent="数字入れて";
     return;
   }
 
-  if (value < q.min) {
-    error.textContent = "0以上の数字を入れてね";
-    return;
-  }
-
-  if (q.max !== undefined && value > q.max) {
-    error.textContent = "ここは0か1だけ入れてね";
-    return;
-  }
-
-  data[q.key] = value;
+  data[questions[step].key]=Number(value);
   step++;
 
-  input.value = "";
+  document.getElementById("input").value="";
+  document.getElementById("inputError").textContent="";
 
-  if (step < questions.length) {
-    document.getElementById("question").textContent = questions[step].text;
-    document.getElementById("hint").textContent = questions[step].hint;
-    input.focus();
-  } else {
+  if(step<questions.length){
+    document.getElementById("question").textContent=questions[step].text;
+    document.getElementById("hint").textContent=questions[step].hint;
+  }else{
     calc();
   }
 }
 
-function calc() {
-  const total =
-    data.hp * 2 +
-    data.main * 40 +
-    data.sub * 6 +
-    data.up * 500 +
-    data.speed * 400 +
-    6000 +
-    24920 +
+function calc(){
+  const total=
+    data.hp*2+
+    data.main*40+
+    data.sub*6+
+    data.up*500+
+    data.speed*400+
+    6000+
+    24920+
     75000;
 
-  let comment = "";
-  let rank = "";
-  let rankClass = "";
+  let comment="";
+  let rankClass="";
 
-  if (total >= 210000) {
-    rank = "Sランク";
-    comment = "最強〜！いまいる中でもトップクラス！";
-    rankClass = "rank-s";
-  } else if (total >= 205000) {
-    rank = "A+ランク";
-    comment = "めちゃ強い！21万まであと少し！";
-    rankClass = "rank-a";
-  } else if (total >= 200000) {
-    rank = "Aランク";
-    comment = "かなり強い！主力として使える！";
-    rankClass = "rank-a";
-  } else if (total >= 198000) {
-    rank = "B+ランク";
-    comment = "おしい！20万まであとちょっと！";
-    rankClass = "rank-b";
-  } else if (total >= 190000) {
-    rank = "Bランク";
-    comment = "まぁまぁ強い！他にいなければ育ててもいいかなレベル";
-    rankClass = "rank-b";
-  } else if (total >= 188000) {
-    rank = "C+ランク";
-    comment = "おしい！19万まであと少し！";
-    rankClass = "rank-c";
-  } else if (total >= 180000) {
-    rank = "Cランク";
-    comment = "ふつう";
-    rankClass = "rank-c";
-  } else {
-    rank = "Dランク";
-    comment = "よわい！育成おすすめしないかも";
-    rankClass = "rank-d";
+  if(total>=210000){
+    comment="21万…！？脅威！！！";
+    rankClass="rank-s";
+  }else if(total>=205000){
+    comment="はーい惜しかったねえ〜！";
+    rankClass="rank-a";
+  }else if(total>=200000){
+    comment="まぁ、出るよね！";
+    rankClass="rank-a";
+  }else if(total>=190000){
+    comment="まぁその程度だよね";
+    rankClass="rank-b";
+  }else if(total>=180000){
+    comment="え？そいつ育てるの？";
+    rankClass="rank-c";
+  }else{
+    comment="・・・";
+    rankClass="rank-d";
   }
 
-  document.body.innerHTML = `
-    <div class="box fade-in">
-      <h1>計算結果</h1>
-
-      <div class="result-area">
-        <div class="character">
-          <img src="character.png">
-        </div>
-
-        <div class="bubble ${rankClass}">
-          最終戦力は…<br>
-          <strong>${total.toLocaleString()}！</strong><br><br>
-          【${rank}】<br>
-          ${comment}
-        </div>
+  document.body.innerHTML=`
+    <div class="box">
+      <h1>結果</h1>
+      <div class="bubble ${rankClass}">
+        最終戦力は…<br>
+        <strong>${total.toLocaleString()}！</strong><br><br>
+        ${comment}
       </div>
-
-      <button onclick="location.reload()">もう一度計算する</button>
+      <button onclick="location.reload()">もう一回</button>
     </div>
   `;
 }
